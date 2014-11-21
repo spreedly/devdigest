@@ -46,12 +46,13 @@ task :daily_email do
 
     :via => :smtp,
     :via_options => {
-      :address        => ENV["MAILGUN_SMTP_SERVER"],
-      :port           => ENV["MAILGUN_SMTP_PORT"],
-      :user_name      => ENV["MAILGUN_SMTP_LOGIN"],
-      :password       => ENV["MAILGUN_SMTP_PASSWORD"],
+      :address        => ENV["MAILGUN_SMTP_SERVER"] || ENV["SMTP_SERVER"] || "smtp.sendgrid.net",
+      :port           => ENV["MAILGUN_SMTP_PORT"] || ENV["SMTP_PORT"] || 587,
+      :user_name      => ENV["MAILGUN_SMTP_LOGIN"] || ENV["SMTP_LOGIN"],
+      :password       => ENV["MAILGUN_SMTP_PASSWORD"] || ENV["SMTP_PASSWORD"],
       :authentication => :plain,
-      :domain         => "spreedly.com"
+      :domain         => "spreedly.com",
+      :enable_starttls_auto => true
     }
   })
 
