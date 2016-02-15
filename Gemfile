@@ -2,7 +2,7 @@ source "https://rubygems.org"
 ruby "2.1.5"
 
 gem "foreman"
-gem "github_api"
+gem "github_api", '=0.12.4'
 gem "pony"
 gem "rake"
 gem "rdiscount"
