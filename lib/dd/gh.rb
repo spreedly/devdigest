@@ -36,12 +36,6 @@ module Dd
           link          = "[#{action} pull](#{pull_request.html_url})"
           [ pull_request.title, link ]
         },
-        "IssuesEvent" => lambda { |event|
-          action = event.payload.action # opened/closed/reopened
-          issue = event.payload.issue
-          link = "[#{action} issue](#{issue.html_url})"
-          [ issue.title, link ]
-        },
         "PushEvent" => lambda { |event|
           commits  = event.payload.commits
           if commits.empty?
@@ -52,11 +46,7 @@ module Dd
               "[pushed #{commits.size}](#{commits.last.url.sub!("api.github.com/repos", "github.com").sub!("commits", "commit")})"
             ]
           end
-        },
-        "IssueCommentEvent" => lambda { |event|
-          link = "[commented](#{event.payload.comment.html_url})"
-          [ event.payload.issue.title, link ]
-        },
+        }
       }
 
       repos.each do |repo_and_org|
