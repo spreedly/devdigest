@@ -25,7 +25,6 @@ module Dd
       add ""
 
       repos = get_repos(ENV['GITHUB_REPOS'], org)
-      users = get_users(ENV['GITHUB_USERS'], org)
 
       activity = {}
 
@@ -66,7 +65,7 @@ module Dd
               break
             end
 
-            next unless users.include?(event.actor.login) && important_events.has_key?(event.type)
+            next unless important_events.has_key?(event.type)
 
             activity[event.actor.login] ||= {}
             activity[event.actor.login][repo] ||= {}
@@ -117,19 +116,6 @@ module Dd
       end
       repos.sort
       repos
-    end
-
-    def get_users(users, org)
-      if users
-        users = users.split(",")
-      else
-        users = []
-        @github.orgs.members.list(org) { |member|
-          users << member.login
-        }
-      end
-      users.sort
-      users
     end
 
   end

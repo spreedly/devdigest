@@ -32,16 +32,6 @@ You will then also need to give the `spreedly-bot` GitHub user access to the new
 
 ![](http://cl.ly/YuTV/Image%202014-12-10%20at%209.58.34%20AM.png)
 
-This will monitor the given repos *only* for the activity of a set of users. To add a new user to the set of users...
-
-### Add a new user
-
-```session
-$ heroku config:set GITHUB_USERS="`heroku config:get GITHUB_USERS`,new-user"
-```
-
-A bunch of other settings can be found with `heroku config`.
-
 ## Usage
 
 The app on Heroku is configured to send out an email once per weekday. To manually invoke this task you can run:
