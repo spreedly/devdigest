@@ -32,7 +32,7 @@ module Dd
         "PullRequestEvent" => lambda { |event|
           action        = event.payload.action # opened/closed/reopened/synchronize
           pull_request  = event.payload.pull_request
-          link          = "[#{action} pull](#{pull_request.html_url})"
+          link          = "[pull request](#{pull_request.html_url})"
           [ pull_request.title, link ]
         },
         "PushEvent" => lambda { |event|
@@ -42,7 +42,7 @@ module Dd
           else
             [
               commits.first.message.split("\n").first,
-              "[pushed #{commits.size}](#{commits.last.url.sub!("api.github.com/repos", "github.com").sub!("commits", "commit")})"
+              "[commit](#{commits.last.url.sub!("api.github.com/repos", "github.com").sub!("commits", "commit")})"
             ]
           end
         }
@@ -59,6 +59,7 @@ module Dd
         collected_all = false
         res.each_page do |page|
           page.each do |event|
+
             if Time.parse(event.created_at) < @since.utc
               puts "We're done: #{Time.parse(event.created_at)} (#{@since.utc})"
               collected_all = true
@@ -67,36 +68,26 @@ module Dd
 
             next unless important_events.has_key?(event.type)
 
-            activity[event.actor.login] ||= {}
-            activity[event.actor.login][repo] ||= {}
+            activity[repo] ||= {}
+            activity[repo][event.actor.login] ||= {}
             title, link = important_events[event.type].call(event)
-            activity[event.actor.login][repo][title] ||= []
-            activity[event.actor.login][repo][title] << link
+            activity[repo][event.actor.login][title] ||= []
+            activity[repo][event.actor.login][title] << link
 
           end
           break if collected_all
         end
       end
 
-      activity.keys.sort.each do |user|
-        info = @github.users.get user: user
-        if info.has_key?('name') && !info.name.empty?
-          add " - **#{info.name}**"
-        else
-          add " - **#{info.login}**"
-        end
-
-        if activity[user].values.all? {|repo| repo.empty?}
-          add " - no tracked activity"
-        else
-          activity[user].each do |repo, events|
-            next if events.empty?
-            add "   - #{repo}"
-            events.each do |title, links|
-              add "     - #{title} #{links.join(', ')}"
-            end
+      activity.each do |repo, user_activity|
+        add "### #{repo} activity"
+        add ""
+        user_activity.each do |user, activity|
+          activity.each do |title, links|
+            add "* #{links.join(', ')} #{title}"
           end
         end
+        add ""
       end
 
       add ""
