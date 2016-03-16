@@ -1,6 +1,20 @@
 # Devdigest
 
-Send out Spreedly's GitHub activity on a (week)daily basis.
+Send out Spreedly's GitHub activity on a daily basis.
+
+## Development
+
+To setup the app locally, copy the sample config:
+
+```bash
+$ cp .env.sample .env
+```
+
+Then use `heroku local` to load up the env and run one of the rake tasks:
+
+```bash
+$ heroku local:run bundle exec rake digest
+```
 
 ## Configuration
 
