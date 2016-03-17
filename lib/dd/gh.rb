@@ -11,19 +11,14 @@ module Dd
 
     def run
       collect(@org)
+
+      body = "## Github activity in the #{@org} org\n\n"
       if(@digest.length > 0)
-        <<-EOS
-## Github activity in the #{@org} org
-
-#{@digest}
-        EOS
+        body += @digest
       else
-        <<-EOS
-## Github activity in the #{@org} org
-
-*No activity reported for the monitored repos in this time period*
-        EOS
+        body += "*No activity reported for the monitored repos in this time period*"
       end
+      body += "\n*The following repositories were included in this digest: #{ENV["GITHUB_REPOS"].split(",").join(", ")}*"
     end
 
     private
