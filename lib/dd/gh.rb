@@ -50,7 +50,7 @@ module Dd
             commit = commit_data["commit"]
             if(commit && commit["message"])
               commit_msg = commit["message"].split("\n").first
-              add "* [#{commit_msg}](#{commit["url"]}) by #{commit["committer"]["name"]}"
+              add "* [#{commit_msg}](#{commit_data["html_url"]}) by #{commit["committer"]["name"]}"
             end
           end
           add ""
