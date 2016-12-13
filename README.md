@@ -2,6 +2,14 @@
 
 Send out Spreedly's GitHub activity on a daily basis.
 
+# Heroku remote
+
+Configure the Heroku remote with the following:
+
+```
+heroku git:remote -a spreedly-devdigest
+```
+
 ## Development
 
 To setup the app locally, copy the sample config:
