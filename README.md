@@ -2,14 +2,6 @@
 
 Send out Spreedly's GitHub activity on a daily basis.
 
-# Heroku remote
-
-Configure the Heroku remote with the following:
-
-```
-heroku git:remote -a spreedly-devdigest
-```
-
 ## Development
 
 To setup the app locally, copy the sample config:
@@ -27,6 +19,14 @@ $ heroku local:run bundle exec rake digest
 ## Configuration
 
 *Assumes you are a collaborator on the `spreedly-devdigest` Heroku app*
+
+### Heroku remote
+
+In order for the `heroku` CLI to run, you need to have the `heroku` git remote configured locally. Do so with:
+
+```bash
+$ heroku git:remote -a spreedly-devdigest
+```
 
 ### Add a new repository
 
