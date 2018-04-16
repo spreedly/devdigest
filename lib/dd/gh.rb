@@ -10,7 +10,8 @@ module Dd
     end
 
     def run
-      collect(@org)
+      repos = get_repos(ENV['GITHUB_REPOS'], @org)
+      collect(@org, repos)
 
       body = "## Github activity in the #{@org} org\n\n"
       if(@digest.length > 0)
@@ -18,7 +19,7 @@ module Dd
       else
         body += "*No activity reported for the monitored repos in this time period*"
       end
-      body += "\n*The following repositories were included in this digest: #{ENV["GITHUB_REPOS"].split(",").join(", ")}*"
+      body += "\n*The following repositories were included in this digest: #{repos.join(", ")}*"
     end
 
     private
@@ -27,47 +28,48 @@ module Dd
       @digest << "#{row}\n"
     end
 
-    def collect(org)
+    def collect(org, repos)
+      repos.each do |repo|
 
-      repos = get_repos(ENV['GITHUB_REPOS'], org)
-      repos.each do |repo_and_org|
+        begin
+          commits = @github.repos.commits.list(org, repo, since: @since.iso8601)
 
-        # repo can contain an override org
-        repo, repo_org = repo_and_org.split("@").push(org)
-        commits = @github.repos.commits.list(repo_org, repo, since: @since.iso8601)
+          if commits.any?
 
-        if commits.any?
+            add "### Commits to #{repo}/master"
+            add ""
 
-          add "### Commits to #{repo}/master"
-          add ""
-
-          commits.each do |commit_data|
-            commit = commit_data["commit"]
-            if(commit && commit["message"])
-              commit_msg = commit["message"].split("\n").first
-              add "* [#{commit_msg}](#{commit_data["html_url"]}) by #{commit["committer"]["name"]}"
+            commits.each do |commit_data|
+              commit = commit_data["commit"]
+              if(commit && commit["message"])
+                commit_msg = commit["message"].split("\n").first
+                add "* [#{commit_msg}](#{commit_data["html_url"]}) by #{commit["committer"]["name"]}"
+              end
             end
+            add ""
           end
+        rescue => e
+          puts e.to_s
+          e.backtrace.each { |line| puts line }
+          add "!! Error getting commits for #{repo} (see logs for details)"
           add ""
         end
       end
-
-      rescue => e
-        add e.to_s
-        e.backtrace.each { |line| add(' ' + line) }
     end
 
-    def get_repos(repos, org)
-      if repos
-        repos = repos.split(",")
+    def get_repos(repo_patterns, org)
+      return @repos if @repos
+      @repos = []
+      all_repos = @github.repos.list(:org => org).collect{ |repo| repo.name }
+
+      if repo_patterns
+        @repos = repo_patterns.split(",").collect do |pattern|
+          all_repos.select { |repo| repo.match?(pattern) }
+        end
       else
-        repos = []
-        @github.repos.list(:org => org) { |repo|
-          repos << repo.name
-        }
+        @repos = all_repos
       end
-      repos.sort
-      repos
+      @repos = @repos.flatten.compact.uniq.sort
     end
 
   end
