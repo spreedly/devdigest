@@ -39,7 +39,7 @@ GEM
     polyglot (0.3.3)
     pony (1.4)
       mail (> 2.0)
-    rack (1.6.4)
+    rack (2.2.3)
     rake (0.9.6)
     rdiscount (1.6.8)
     rest-client (1.6.7)
